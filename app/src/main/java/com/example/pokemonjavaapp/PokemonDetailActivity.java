@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -55,6 +56,11 @@ public class PokemonDetailActivity extends AppCompatActivity {
                     (pokemon.weakness != null && !pokemon.weakness.isEmpty()
                             ? String.join(", ", pokemon.weakness)
                             : "無"));
+
+            Button btnBackToMain = findViewById(R.id.btnBackToMain);
+            btnBackToMain.setOnClickListener(v -> {
+                finish(); // 👈 關閉當前畫面，回到 MainActivity
+            });
             // 顯示圖片（從 github path 載入）
             String imageUrl = "https://raw.githubusercontent.com/f2855631/pokemon-crawler/main/" + pokemon.image;
             Log.d("DETAIL_IMAGE_URL", "載入圖片網址: " + imageUrl);

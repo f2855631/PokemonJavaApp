@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 
@@ -29,7 +28,7 @@ public class PokemonPagerAdapter extends RecyclerView.Adapter<PokemonPagerAdapte
     @NonNull
     @Override
     public PokemonViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_pokemon, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_pokemon_card, parent, false);
         return new PokemonViewHolder(view);
     }
 

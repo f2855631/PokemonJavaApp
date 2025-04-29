@@ -1,35 +1,46 @@
 package com.example.pokemonjavaapp;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager2.widget.ViewPager2;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ViewPager2 viewPager;
-    private PokemonPagerAdapter adapter;
-
-    private List<Pokemon> fullPokemonList;
+    private RecyclerView recyclerView;
+    private PokemonAdapter adapter;
+    private List<Pokemon> fullPokemonList = new ArrayList<>();
+    private List<Pokemon> originalList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        viewPager = findViewById(R.id.viewPager);
-        viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
+        recyclerView = findViewById(R.id.pokemonRecyclerView);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+
+        Button btnBack = findViewById(R.id.btnBack);
+        Button btnCaught = findViewById(R.id.btnCaught);
+        Button btnUncaught = findViewById(R.id.btnUncaught);
 
         PokemonFetcher.fetchPokemonData(new PokemonFetcher.OnDataFetched() {
             @Override
             public void onSuccess(List<Pokemon> pokemonList) {
-                fullPokemonList = pokemonList;
-                adapter = new PokemonPagerAdapter(MainActivity.this, pokemonList);
-                viewPager.setAdapter(adapter);
+                fullPokemonList = new ArrayList<>(pokemonList);
+                originalList = new ArrayList<>(pokemonList); // 存原始資料
+                adapter = new PokemonAdapter(MainActivity.this, fullPokemonList);
+                recyclerView.setAdapter(adapter);
             }
 
             @Override
@@ -42,25 +53,81 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                filterPokemon(query.trim());
+                filterPokemon(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                filterPokemon(newText);
                 return true;
             }
+        });
+
+        btnBack.setOnClickListener(v -> {
+            if (adapter != null) {
+                adapter.updateList(new ArrayList<>(originalList));
+            }
+        });
+
+        btnCaught.setOnClickListener(v -> {
+            SharedPreferences prefs = getSharedPreferences("pokemonPrefs", MODE_PRIVATE);
+            Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
+
+            List<Pokemon> caughtList = new ArrayList<>();
+            for (Pokemon p : originalList) {
+                if (caughtSet.contains(p.id)) {
+                    caughtList.add(p);
+                }
+            }
+            adapter.updateList(caughtList);
+        });
+
+        btnUncaught.setOnClickListener(v -> {
+            SharedPreferences prefs = getSharedPreferences("pokemonPrefs", MODE_PRIVATE);
+            Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
+
+            List<Pokemon> uncaughtList = new ArrayList<>();
+            for (Pokemon p : originalList) {
+                if (!caughtSet.contains(p.id)) {
+                    uncaughtList.add(p);
+                }
+            }
+            adapter.updateList(uncaughtList);
         });
     }
 
     public void filterPokemon(String query) {
-        if (adapter != null && fullPokemonList != null) {
-            List<Pokemon> filtered = new java.util.ArrayList<>();
-            for (Pokemon p : fullPokemonList) {
-                if (p.name.contains(query) || p.id.contains(query)) {
+        if (adapter != null && originalList != null) {
+            String trimmedQuery = query.trim();
+
+            if (trimmedQuery.isEmpty()) {
+                adapter.updateList(new ArrayList<>(originalList));
+                return;
+            }
+
+            List<Pokemon> filtered = new ArrayList<>();
+            String lowerQuery = trimmedQuery.toLowerCase();
+
+            for (Pokemon p : originalList) {
+                boolean matchName = p.name.toLowerCase().contains(lowerQuery);
+                boolean matchId = p.id.contains(lowerQuery.replace("#", ""));
+                boolean matchType = false;
+
+                if (p.type != null) {
+                    for (String t : p.type) {
+                        if (t.toLowerCase().contains(lowerQuery)) {
+                            matchType = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (matchName || matchId || matchType) {
                     filtered.add(p);
                 }
             }
+
             adapter.updateList(filtered);
         }
     }
