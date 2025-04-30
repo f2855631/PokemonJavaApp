@@ -3,10 +3,12 @@ package com.example.pokemonjavaapp;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.Button;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,6 +16,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import android.graphics.Rect;
+import android.view.View;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -129,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             adapter.updateList(filtered);
+
         }
     }
 }
