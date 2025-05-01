@@ -1,6 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@android:color/transparent"/>
-    <stroke android:width="5dp" android:color="#000000"/>
-    <corners android:radius="16dp"/>
+
+    <!-- 背景色透明 -->
+    <solid android:color="@android:color/transparent" />
+
+    <!-- 四角圓弧 -->
+    <corners android:radius="16dp" />
+
+    <!-- 外框線 -->
+    <stroke
+        android:width="6dp"
+        android:color="#000000" />
 </shape>

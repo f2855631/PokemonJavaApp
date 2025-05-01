@@ -16,8 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder> {
@@ -26,11 +28,32 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
     private final SharedPreferences prefs;
     private final Set<String> caughtSet;
 
+    private static final Map<String, String> typeMap = new HashMap<String, String>() {{
+        put("一般", "normal");
+        put("火", "fire");
+        put("水", "water");
+        put("草", "grass");
+        put("電", "electric");
+        put("冰", "ice");
+        put("格鬥", "fighting");
+        put("毒", "poison");
+        put("地面", "ground");
+        put("飛行", "flying");
+        put("超能", "psychic");
+        put("蟲", "bug");
+        put("岩石", "rock");
+        put("幽靈", "ghost");
+        put("龍", "dragon");
+        put("惡", "dark");
+        put("鋼", "steel");
+        put("妖精", "fairy");
+    }};
+
     public PokemonAdapter(Context context, List<Pokemon> pokemonList) {
         this.context = context;
         this.pokemonList = pokemonList;
         this.prefs = context.getSharedPreferences("pokemonPrefs", Context.MODE_PRIVATE);
-        this.caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
+        this.caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>())) ;
     }
 
     @NonNull
@@ -44,38 +67,42 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         Pokemon p = pokemonList.get(position);
 
-        // 顯示名稱
         holder.textName.setText(p.name);
-
-        // 顯示編號
         holder.textId.setText(String.format("%04d", Integer.parseInt(p.id)));
 
-        // 顯示屬性，List轉成字串
         if (p.type != null && !p.type.isEmpty()) {
-            holder.textType.setText(String.join(" / ", p.type));
+            String type1Eng = typeMap.get(p.type.get(0));
+            int resId1 = context.getResources().getIdentifier(type1Eng, "drawable", context.getPackageName());
+            holder.imageType1.setImageResource(resId1);
+
+            if (p.type.size() > 1) {
+                holder.imageType2.setVisibility(View.VISIBLE);
+                String type2Eng = typeMap.get(p.type.get(1));
+                int resId2 = context.getResources().getIdentifier(type2Eng, "drawable", context.getPackageName());
+                holder.imageType2.setImageResource(resId2);
+            } else {
+                holder.imageType2.setVisibility(View.GONE);
+            }
         } else {
-            holder.textType.setText("");
+            holder.imageType1.setVisibility(View.GONE);
+            holder.imageType2.setVisibility(View.GONE);
         }
 
-        // 顯示圖片
         String imageUrl = "https://raw.githubusercontent.com/f2855631/pokemon-crawler/main/" + p.image;
         Glide.with(context).load(imageUrl).into(holder.imagePokemon);
 
-        // 顯示是否已收服
         if (caughtSet.contains(p.id)) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#D0F0C0")); // 淺綠色
+            holder.itemView.setBackgroundColor(Color.parseColor("#D0F0C0"));
         } else {
             holder.itemView.setBackgroundColor(Color.WHITE);
         }
 
-        // 點一下進入詳細頁
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, PokemonDetailActivity.class);
             intent.putExtra("pokemon", p);
             context.startActivity(intent);
         });
 
-        // 長按標記已收服
         holder.itemView.setOnLongClickListener(v -> {
             toggleCaught(p);
             notifyItemChanged(position);
@@ -111,14 +138,16 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
 
     public static class PokemonViewHolder extends RecyclerView.ViewHolder {
         ImageView imagePokemon;
-        TextView textId, textType, textName; // ← 加上名字這一行
+        TextView textId, textName;
+        ImageView imageType1, imageType2;
 
         public PokemonViewHolder(@NonNull View itemView) {
             super(itemView);
             imagePokemon = itemView.findViewById(R.id.img_pokemon);
             textId = itemView.findViewById(R.id.tv_pokemon_number);
-            textType = itemView.findViewById(R.id.tv_pokemon_types);
-            textName = itemView.findViewById(R.id.tv_pokemon_name); // ← 這邊綁定名字
+            textName = itemView.findViewById(R.id.tv_pokemon_name);
+            imageType1 = itemView.findViewById(R.id.img_type1);
+            imageType2 = itemView.findViewById(R.id.img_type2);
         }
     }
 }
