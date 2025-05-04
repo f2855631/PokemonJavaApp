@@ -25,19 +25,6 @@
             android:layout_alignParentTop="true"
             android:background="@drawable/fill_outer_gap" />
 
-        <!-- 黑色外框線 -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/card_border_black" />
-
-        <!-- 分隔線 -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:layout_marginTop="138dp"
-            android:background="#000000" />
-
         <!-- 寶可夢圖片 -->
         <ImageView
             android:id="@+id/img_pokemon"
@@ -69,14 +56,16 @@
                 android:text="妙蛙種子"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
 
             <!-- 編號 + 屬性 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp" >
 
                 <TextView
                     android:id="@+id/tv_pokemon_number"
