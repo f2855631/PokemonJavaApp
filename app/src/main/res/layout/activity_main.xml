@@ -6,18 +6,30 @@
     android:layout_height="match_parent"
     android:background="@drawable/background">
 
-    <!-- 🔍 搜尋欄放在最上方 -->
+    <!-- 🔹 Toolbar：縮小高度為 48dp -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:background="?attr/colorPrimary"
+        android:titleTextColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:title="@string/app_title"/>
+
+    <!-- 🔍 搜尋欄：減少 margin，讓高度更扁 -->
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
         android:queryHint="搜尋寶可夢"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="8dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 📃 寶可夢清單放中間 -->
+    <!-- 📃 寶可夢列表 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pokemonRecyclerView"
         android:layout_width="0dp"
@@ -27,41 +39,10 @@
         android:clipToPadding="false"
         android:scrollbars="vertical"
         app:layout_constraintTop_toBottomOf="@id/searchView"
-        app:layout_constraintBottom_toTopOf="@id/buttonBar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- 🔘 功能鍵放最下方 -->
-    <LinearLayout
-        android:id="@+id/buttonBar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@null"/>
 
-        <Button
-            android:id="@+id/btnBack"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="回主畫面"/>
-
-        <Button
-            android:id="@+id/btnCaught"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="已收服"/>
-
-        <Button
-            android:id="@+id/btnUncaught"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="未收服"/>
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
+

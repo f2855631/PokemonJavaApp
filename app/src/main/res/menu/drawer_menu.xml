@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_home" android:title="主畫面" />
+    <item android:id="@+id/nav_caught" android:title="已收服" />
+    <item android:id="@+id/nav_uncaught" android:title="未收服" />
+</menu>
