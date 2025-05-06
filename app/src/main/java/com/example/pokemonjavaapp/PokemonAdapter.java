@@ -53,7 +53,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         this.context = context;
         this.pokemonList = pokemonList;
         this.prefs = context.getSharedPreferences("pokemonPrefs", Context.MODE_PRIVATE);
-        this.caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>())) ;
+        this.caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
     }
 
     @NonNull
@@ -68,18 +68,39 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         Pokemon p = pokemonList.get(position);
 
         holder.textName.setText(p.name);
-        holder.textId.setText(String.format("%04d", Integer.parseInt(p.id)));
+        try {
+            holder.textId.setText(String.format("%04d", Integer.parseInt(p.id)));
+        } catch (NumberFormatException e) {
+            holder.textId.setText(p.id);
+        }
 
         if (p.type != null && !p.type.isEmpty()) {
-            String type1Eng = typeMap.get(p.type.get(0));
-            int resId1 = context.getResources().getIdentifier(type1Eng, "drawable", context.getPackageName());
-            holder.imageType1.setImageResource(resId1);
+            String type1Eng = typeMap.getOrDefault(p.type.get(0), null);
+            if (type1Eng != null) {
+                int resId1 = context.getResources().getIdentifier(type1Eng, "drawable", context.getPackageName());
+                if (resId1 != 0) {
+                    holder.imageType1.setImageResource(resId1);
+                    holder.imageType1.setVisibility(View.VISIBLE);
+                } else {
+                    holder.imageType1.setVisibility(View.GONE);
+                }
+            } else {
+                holder.imageType1.setVisibility(View.GONE);
+            }
 
             if (p.type.size() > 1) {
-                holder.imageType2.setVisibility(View.VISIBLE);
-                String type2Eng = typeMap.get(p.type.get(1));
-                int resId2 = context.getResources().getIdentifier(type2Eng, "drawable", context.getPackageName());
-                holder.imageType2.setImageResource(resId2);
+                String type2Eng = typeMap.getOrDefault(p.type.get(1), null);
+                if (type2Eng != null) {
+                    int resId2 = context.getResources().getIdentifier(type2Eng, "drawable", context.getPackageName());
+                    if (resId2 != 0) {
+                        holder.imageType2.setImageResource(resId2);
+                        holder.imageType2.setVisibility(View.VISIBLE);
+                    } else {
+                        holder.imageType2.setVisibility(View.GONE);
+                    }
+                } else {
+                    holder.imageType2.setVisibility(View.GONE);
+                }
             } else {
                 holder.imageType2.setVisibility(View.GONE);
             }

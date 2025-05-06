@@ -1,6 +1,7 @@
 package com.example.pokemonjavaapp;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Layout;
@@ -11,19 +12,17 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.SearchView;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +31,6 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private Toolbar toolbar;
     private PokemonAdapter adapter;
     private List<Pokemon> fullPokemonList = new ArrayList<>();
     private List<Pokemon> originalList = new ArrayList<>();
@@ -42,16 +40,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Toolbar 設定
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        // RecyclerView 初始化
         recyclerView = findViewById(R.id.pokemonRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        // 資料抓取
         PokemonFetcher.fetchPokemonData(new PokemonFetcher.OnDataFetched() {
             @Override
             public void onSuccess(List<Pokemon> pokemonList) {
@@ -67,8 +58,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 搜尋功能
         SearchView searchView = findViewById(R.id.searchView);
+        searchView.setIconifiedByDefault(false);
+        searchView.setQueryHint("使用名稱或圖鑑編號搜尋");
+
+        View searchPlate = searchView.findViewById(androidx.appcompat.R.id.search_plate);
+        if (searchPlate != null) searchPlate.setBackgroundColor(Color.TRANSPARENT);
+
+        EditText searchText = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        if (searchText != null) {
+            searchText.setTextColor(Color.BLACK);
+            searchText.setHintTextColor(Color.GRAY);
+        }
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -82,39 +84,13 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_filter) {
-
-            View anchor = findViewById(R.id.menu_filter);
-            if (anchor == null) anchor = toolbar;
-
-            PopupMenu popup = new PopupMenu(this, anchor, Gravity.END);
-
-            // 自定義字體樣式
+        ImageView menuIcon = findViewById(R.id.menu_filter);
+        menuIcon.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(MainActivity.this, menuIcon, Gravity.END);
             popup.getMenu().add(makeStyledText("主畫面"));
             popup.getMenu().add(makeStyledText("已收服"));
             popup.getMenu().add(makeStyledText("未收服"));
-
-            // 反射啟用圖示（即使沒用 icon 也建議放上）
-            try {
-                Field mPopup = popup.getClass().getDeclaredField("mPopup");
-                mPopup.setAccessible(true);
-                Object menuPopupHelper = mPopup.get(popup);
-                Method setForceShowIcon = menuPopupHelper.getClass()
-                        .getDeclaredMethod("setForceShowIcon", boolean.class);
-                setForceShowIcon.invoke(menuPopupHelper, true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 
             popup.setOnMenuItemClickListener(menuItem -> {
                 String title = menuItem.getTitle().toString().replace(" ", "").trim();
@@ -138,10 +114,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             popup.show();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        });
     }
 
     private SpannableString makeStyledText(String text) {
@@ -164,13 +137,13 @@ public class MainActivity extends AppCompatActivity {
             String lowerQuery = trimmedQuery.toLowerCase();
 
             for (Pokemon p : originalList) {
-                boolean matchName = p.name.toLowerCase().contains(lowerQuery);
-                boolean matchId = p.id.contains(lowerQuery.replace("#", ""));
+                boolean matchName = p.name != null && p.name.toLowerCase().contains(lowerQuery);
+                boolean matchId = p.id != null && p.id.contains(lowerQuery.replace("#", ""));
                 boolean matchType = false;
 
                 if (p.type != null) {
                     for (String t : p.type) {
-                        if (t.toLowerCase().contains(lowerQuery)) {
+                        if (t != null && t.toLowerCase().contains(lowerQuery)) {
                             matchType = true;
                             break;
                         }

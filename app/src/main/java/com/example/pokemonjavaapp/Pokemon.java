@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Pokemon implements Parcelable {
@@ -16,8 +17,10 @@ public class Pokemon implements Parcelable {
     public String weight;
     public List<String> abilities;
     public List<String> weakness;
+
     @SerializedName("types")
     public List<String> type;
+
     @SerializedName("image")
     public String image;
 
@@ -31,9 +34,16 @@ public class Pokemon implements Parcelable {
         gender = in.readString();
         height = in.readString();
         weight = in.readString();
+
         abilities = in.createStringArrayList();
+        if (abilities == null) abilities = new ArrayList<>();
+
         weakness = in.createStringArrayList();
+        if (weakness == null) weakness = new ArrayList<>();
+
         type = in.createStringArrayList();
+        if (type == null) type = new ArrayList<>();
+
         image = in.readString();
     }
 
@@ -63,9 +73,9 @@ public class Pokemon implements Parcelable {
         parcel.writeString(gender);
         parcel.writeString(height);
         parcel.writeString(weight);
-        parcel.writeStringList(abilities);
-        parcel.writeStringList(weakness);
-        parcel.writeStringList(type);
+        parcel.writeStringList(abilities != null ? abilities : new ArrayList<>());
+        parcel.writeStringList(weakness != null ? weakness : new ArrayList<>());
+        parcel.writeStringList(type != null ? type : new ArrayList<>());
         parcel.writeString(image);
     }
 }

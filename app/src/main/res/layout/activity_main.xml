@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background">
 
-    <!-- 🔹 Toolbar：縮小高度為 48dp -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:background="?attr/colorPrimary"
-        android:titleTextColor="@android:color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:title="@string/app_title"/>
-
-    <!-- 🔍 搜尋欄：減少 margin，讓高度更扁 -->
-    <SearchView
-        android:id="@+id/searchView"
+    <!-- 🔍+☰ 搜尋列與漢堡列 -->
+    <LinearLayout
+        android:id="@+id/searchRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:queryHint="搜尋寶可夢"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        android:orientation="horizontal"
+        android:layout_margin="8dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 🔍 搜尋框 -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/search_box_background"
+            android:iconifiedByDefault="false"
+            android:inputType="text"
+            android:maxWidth="10000dp"
+            android:queryHint="使用名稱或圖鑑編號搜尋" />
+
+        <!-- ☰ 漢堡選單 -->
+        <ImageView
+            android:id="@+id/menu_filter"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="Menu"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
 
     <!-- 📃 寶可夢列表 -->
     <androidx.recyclerview.widget.RecyclerView
@@ -38,11 +49,12 @@
         android:paddingEnd="12dp"
         android:clipToPadding="false"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintTop_toBottomOf="@id/searchRow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@null"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
