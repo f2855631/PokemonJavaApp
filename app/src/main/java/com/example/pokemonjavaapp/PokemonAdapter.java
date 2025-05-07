@@ -39,7 +39,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         put("毒", "poison");
         put("地面", "ground");
         put("飛行", "flying");
-        put("超能", "psychic");
+        put("超能力", "psychic");
         put("蟲", "bug");
         put("岩石", "rock");
         put("幽靈", "ghost");

@@ -23,7 +23,7 @@
             android:layout_height="48dp"
             android:layout_weight="1"
             android:background="@drawable/search_box_background"
-            android:iconifiedByDefault="false"
+            android:iconifiedByDefault="true"
             android:inputType="text"
             android:maxWidth="10000dp"
             android:queryHint="使用名稱或圖鑑編號搜尋" />

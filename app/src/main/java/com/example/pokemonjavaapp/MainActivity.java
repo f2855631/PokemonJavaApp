@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         SearchView searchView = findViewById(R.id.searchView);
-        searchView.setIconifiedByDefault(false);
+        searchView.setIconifiedByDefault(true);
         searchView.setQueryHint("使用名稱或圖鑑編號搜尋");
 
         View searchPlate = searchView.findViewById(androidx.appcompat.R.id.search_plate);
