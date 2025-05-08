@@ -137,8 +137,10 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
 
         if (caughtSet.contains(p.id)) {
             holder.itemView.setBackgroundColor(Color.parseColor("#D0F0C0"));
+            holder.caughtStampImageView.setVisibility(View.VISIBLE);
         } else {
             holder.itemView.setBackgroundColor(Color.WHITE);
+            holder.caughtStampImageView.setVisibility(View.GONE);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -152,17 +154,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             notifyItemChanged(position);
             return true;
         });
-    }
-
-    private void toggleCaught(Pokemon p) {
-        if (caughtSet.contains(p.id)) {
-            caughtSet.remove(p.id);
-            Toast.makeText(context, "❌ 已取消收服：" + p.name, Toast.LENGTH_SHORT).show();
-        } else {
-            caughtSet.add(p.id);
-            Toast.makeText(context, "✅ 已收服：" + p.name, Toast.LENGTH_SHORT).show();
-        }
-        prefs.edit().putStringSet("caughtList", caughtSet).apply();
     }
 
     public Set<String> getCaughtSet() {
@@ -180,8 +171,17 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         notifyDataSetChanged();
     }
 
+    private void toggleCaught(Pokemon p) {
+        if (caughtSet.contains(p.id)) {
+            caughtSet.remove(p.id);
+        } else {
+            caughtSet.add(p.id);
+        }
+        prefs.edit().putStringSet("caughtList", caughtSet).apply();
+    }
+
     public static class PokemonViewHolder extends RecyclerView.ViewHolder {
-        ImageView imagePokemon;
+        ImageView imagePokemon, caughtStampImageView;
         TextView textId, textName, textFormType;
         ImageView imageType1, imageType2;
 
@@ -191,6 +191,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             textId = itemView.findViewById(R.id.tv_pokemon_number);
             textName = itemView.findViewById(R.id.tv_pokemon_name);
             textFormType = itemView.findViewById(R.id.tv_form_type);
+            caughtStampImageView = itemView.findViewById(R.id.img_caught_stamp);
             imageType1 = itemView.findViewById(R.id.img_type1);
             imageType2 = itemView.findViewById(R.id.img_type2);
         }
