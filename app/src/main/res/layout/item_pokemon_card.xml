@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="160dp"
-    android:layout_height="220dp"
+    android:layout_height="wrap_content"
     android:layout_margin="10dp"
     android:backgroundTint="@android:color/transparent"
     app:cardCornerRadius="16dp"
@@ -12,72 +12,59 @@
     android:clipToOutline="true"
     android:clipChildren="true">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="true"
-        android:clipToPadding="true">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <!-- 上半灰底 -->
-        <View
-            android:id="@+id/top_gray_background"
+        <!-- 上半圖區 -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="140dp"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/fill_outer_gap" />
+            android:background="@drawable/fill_outer_gap">
 
-        <!-- 🆕 型態名稱 (form_type) 放在圖片上方 -->
-        <TextView
-            android:id="@+id/tv_form_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:layout_marginTop="6dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
-            android:visibility="gone" />
+            <TextView
+                android:id="@+id/tv_form_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_centerHorizontal="true"
+                android:padding="4dp"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
-        <ImageView
-            android:id="@+id/img_caught_stamp"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_alignBottom="@id/top_gray_background"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="4dp"
-            android:layout_marginBottom="4dp"
-            android:visibility="gone"
-            android:src="@drawable/caught_stamp"
-            android:contentDescription="已收服印章" />
+            <ImageView
+                android:id="@+id/img_caught_stamp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone"
+                android:src="@drawable/caught_stamp"
+                android:contentDescription="已收服印章" />
 
-        <!-- 寶可夢圖片 -->
-        <ImageView
-            android:id="@+id/img_pokemon"
-            android:layout_width="110dp"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="32dp"
-            android:scaleType="fitCenter"
-            android:contentDescription="@null" />
+            <ImageView
+                android:id="@+id/img_pokemon"
+                android:layout_width="110dp"
+                android:layout_height="100dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+        </RelativeLayout>
 
-        <!-- 資訊區塊 -->
+        <!-- 下半資訊區 -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_alignParentBottom="true"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingBottom="8dp"
+            android:padding="8dp"
             android:background="@drawable/bottom_rounded_background">
 
-            <!-- 名稱 -->
             <TextView
                 android:id="@+id/tv_pokemon_name"
                 android:layout_width="match_parent"
@@ -90,13 +77,12 @@
                 android:textStyle="bold"
                 android:layout_marginTop="4dp" />
 
-            <!-- 編號 + 屬性 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="2dp" >
+                android:layout_marginTop="2dp">
 
                 <TextView
                     android:id="@+id/tv_pokemon_number"
@@ -123,7 +109,8 @@
                     android:contentDescription="@null" />
             </LinearLayout>
         </LinearLayout>
-    </RelativeLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+
 
 

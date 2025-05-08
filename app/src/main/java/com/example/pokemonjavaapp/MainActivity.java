@@ -10,23 +10,38 @@ import android.text.Spanned;
 import android.text.style.AlignmentSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,19 +55,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 🔧 先正確初始化 RecyclerView 與 Adapter
         recyclerView = findViewById(R.id.pokemonRecyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        int spanCount = calculateSpanCount();
+        GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
+        recyclerView.setLayoutManager(layoutManager);
         adapter = new PokemonAdapter(MainActivity.this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        // ✅ 資料抓成功時只 updateList
         PokemonFetcher.fetchPokemonData(new PokemonFetcher.OnDataFetched() {
             @Override
             public void onSuccess(List<Pokemon> pokemonList) {
                 fullPokemonList = new ArrayList<>(pokemonList);
                 originalList = new ArrayList<>(pokemonList);
-                adapter.updateList(fullPokemonList);  // 正確更新資料，不要 new adapter
+                adapter.updateList(fullPokemonList);
             }
 
             @Override
@@ -61,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 🔍 SearchView 設定
         SearchView searchView = findViewById(R.id.searchView);
         searchView.setIconifiedByDefault(true);
         searchView.setQueryHint("使用名稱或圖鑑編號搜尋");
@@ -89,13 +103,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 🍔 選單過濾
         ImageView menuIcon = findViewById(R.id.menu_filter);
         menuIcon.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(MainActivity.this, menuIcon, Gravity.END);
             popup.getMenu().add(makeStyledText("主畫面"));
             popup.getMenu().add(makeStyledText("已收服"));
             popup.getMenu().add(makeStyledText("未收服"));
+            popup.getMenu().add(makeStyledText("世代/地區"));
+            popup.getMenu().add(makeStyledText("Mega進化"));
+            popup.getMenu().add(makeStyledText("超極巨化"));
 
             popup.setOnMenuItemClickListener(menuItem -> {
                 String title = menuItem.getTitle().toString().replace(" ", "").trim();
@@ -103,6 +119,24 @@ public class MainActivity extends AppCompatActivity {
 
                 if (title.contains("主畫面")) {
                     adapter.updateList(new ArrayList<>(originalList));
+                } else if (title.contains("世代/地區")) {
+                    fetchGenerationListAndShowDialog();
+                } else if (title.contains("Mega進化")) {
+                    List<Pokemon> filtered = new ArrayList<>();
+                    for (Pokemon p : originalList) {
+                        if (p.form_type != null && p.form_type.toLowerCase().contains("mega")) {
+                            filtered.add(p);
+                        }
+                    }
+                    adapter.updateList(filtered);
+                } else if (title.contains("超極巨化")) {
+                    List<Pokemon> filtered = new ArrayList<>();
+                    for (Pokemon p : originalList) {
+                        if (p.form_type != null && p.form_type.toLowerCase().contains("gmax")) {
+                            filtered.add(p);
+                        }
+                    }
+                    adapter.updateList(filtered);
                 } else {
                     SharedPreferences prefs = getSharedPreferences("pokemonPrefs", MODE_PRIVATE);
                     Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
@@ -120,6 +154,13 @@ public class MainActivity extends AppCompatActivity {
 
             popup.show();
         });
+    }
+
+    private int calculateSpanCount() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int itemWidth = 180; // 卡片寬度（包含 margin）
+        return Math.max(2, (int) (dpWidth / itemWidth));
     }
 
     private SpannableString makeStyledText(String text) {
@@ -162,5 +203,108 @@ public class MainActivity extends AppCompatActivity {
 
             adapter.updateList(filtered);
         }
+    }
+
+    private void fetchGenerationListAndShowDialog() {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url("https://raw.githubusercontent.com/f2855631/pokemon-crawler/refs/heads/main/pokemon_generations.json")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() ->
+                        Toast.makeText(MainActivity.this, "分類載入失敗", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) return;
+
+                String json = response.body().string();
+                Gson gson = new Gson();
+                GenerationCategory[] generationList = gson.fromJson(json, GenerationCategory[].class);
+
+                List<String> displayList = new ArrayList<>();
+                for (GenerationCategory g : generationList) {
+                    String label = g.generation + "/" + g.region.replaceAll("\\s*\\(.*?\\)", "") + "地區";
+                    displayList.add(label);
+                }
+
+                runOnUiThread(() -> showGenerationDialog(displayList, generationList));
+            }
+        });
+    }
+
+    private void showGenerationDialog(List<String> categories, GenerationCategory[] generationList) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
+
+        TextView title = new TextView(this);
+        title.setText("選擇分類");
+        title.setBackgroundResource(R.drawable.bg_dialog_list);
+        title.setPadding(40, 40, 40, 40);
+        title.setTextSize(20);
+        title.setTypeface(null, Typeface.BOLD);
+        title.setTextColor(Color.BLACK);
+        title.setGravity(Gravity.CENTER);
+
+        builder.setCustomTitle(title);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_item, categories) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView = view.findViewById(android.R.id.text1);
+                textView.setTextSize(20);
+                textView.setTypeface(Typeface.DEFAULT_BOLD);
+                textView.setTextColor(Color.BLACK);
+                textView.setGravity(Gravity.CENTER);
+                textView.setBackgroundResource(R.drawable.bg_dialog_list);
+                textView.setPadding(32, 32, 32, 32);
+                return view;
+            }
+        };
+
+        builder.setAdapter(adapter, (dialog, which) -> {
+            GenerationCategory selected = generationList[which];
+            filterPokemonByRange(selected.nationalRange);
+        });
+
+        builder.show();
+    }
+
+    private void filterPokemonByRange(String range) {
+        String[] parts = range.replace("#", "").split(" - ");
+        int start = Integer.parseInt(parts[0]);
+        int end = Integer.parseInt(parts[1]);
+
+        List<Pokemon> filtered = new ArrayList<>();
+        for (Pokemon p : originalList) {
+            int number = Integer.parseInt(p.id);
+            if (number >= start && number <= end) {
+                filtered.add(p);
+            }
+        }
+
+        adapter.updateList(filtered);
+    }
+
+    public static class GenerationCategory {
+        @SerializedName("世代")
+        public String generation;
+
+        @SerializedName("地區")
+        public String region;
+
+        @SerializedName("全國編號範圍")
+        public String nationalRange;
+
+        @SerializedName("遊戲版本")
+        public String gameVersions;
+
+        @SerializedName("特色")
+        public String feature;
     }
 }
