@@ -40,16 +40,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 🔧 先正確初始化 RecyclerView 與 Adapter
         recyclerView = findViewById(R.id.pokemonRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        adapter = new PokemonAdapter(MainActivity.this, new ArrayList<>());
+        recyclerView.setAdapter(adapter);
 
+        // ✅ 資料抓成功時只 updateList
         PokemonFetcher.fetchPokemonData(new PokemonFetcher.OnDataFetched() {
             @Override
             public void onSuccess(List<Pokemon> pokemonList) {
                 fullPokemonList = new ArrayList<>(pokemonList);
                 originalList = new ArrayList<>(pokemonList);
-                adapter = new PokemonAdapter(MainActivity.this, fullPokemonList);
-                recyclerView.setAdapter(adapter);
+                adapter.updateList(fullPokemonList);  // 正確更新資料，不要 new adapter
             }
 
             @Override
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 🔍 SearchView 設定
         SearchView searchView = findViewById(R.id.searchView);
         searchView.setIconifiedByDefault(true);
         searchView.setQueryHint("使用名稱或圖鑑編號搜尋");
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 🍔 選單過濾
         ImageView menuIcon = findViewById(R.id.menu_filter);
         menuIcon.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(MainActivity.this, menuIcon, Gravity.END);

@@ -11,6 +11,7 @@ public class Pokemon implements Parcelable {
     public String id;
     public int sub_id;
     public String name;
+    public String form_type;
     public String category;
     public String gender;
     public String height;
@@ -30,6 +31,7 @@ public class Pokemon implements Parcelable {
         id = in.readString();
         sub_id = in.readInt();
         name = in.readString();
+        form_type = in.readString();
         category = in.readString();
         gender = in.readString();
         height = in.readString();
@@ -69,6 +71,7 @@ public class Pokemon implements Parcelable {
         parcel.writeString(id);
         parcel.writeInt(sub_id);
         parcel.writeString(name);
+        parcel.writeString(form_type);
         parcel.writeString(category);
         parcel.writeString(gender);
         parcel.writeString(height);
