@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -49,6 +52,15 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         put("妖精", "fairy");
     }};
 
+    private static final Map<String, String> formTypeMap = new HashMap<String, String>() {{
+        put("alola", "阿羅拉的樣子");
+        put("galar", "伽勒爾的樣子");
+        put("hisui", "洗翠的樣子");
+        put("paldea", "帕底亞的樣子");
+        put("gmax", "超極巨化");
+        put("mega", "Mega進化");
+    }};
+
     public PokemonAdapter(Context context, List<Pokemon> pokemonList) {
         this.context = context;
         this.pokemonList = pokemonList;
@@ -63,6 +75,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         return new PokemonViewHolder(view);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         Pokemon p = pokemonList.get(position);
@@ -72,6 +85,16 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             holder.textId.setText(String.format("%04d", Integer.parseInt(p.id)));
         } catch (NumberFormatException e) {
             holder.textId.setText(p.id);
+        }
+        String rawFormType = p.form_type != null ? p.form_type.trim().toLowerCase() : "";
+        String displayFormType = formTypeMap.getOrDefault(rawFormType, "");
+        Log.d("FormTypeMapCheck", "form_type=" + rawFormType + ", mapped=" + displayFormType);
+
+        if (!displayFormType.equals("")) {
+            holder.textFormType.setVisibility(View.VISIBLE);
+            holder.textFormType.setText(displayFormType);
+        } else {
+            holder.textFormType.setVisibility(View.GONE);
         }
 
         if (p.type != null && !p.type.isEmpty()) {
@@ -114,8 +137,10 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
 
         if (caughtSet.contains(p.id)) {
             holder.itemView.setBackgroundColor(Color.parseColor("#D0F0C0"));
+            holder.caughtStampImageView.setVisibility(View.VISIBLE);
         } else {
             holder.itemView.setBackgroundColor(Color.WHITE);
+            holder.caughtStampImageView.setVisibility(View.GONE);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -129,17 +154,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             notifyItemChanged(position);
             return true;
         });
-    }
-
-    private void toggleCaught(Pokemon p) {
-        if (caughtSet.contains(p.id)) {
-            caughtSet.remove(p.id);
-            Toast.makeText(context, "❌ 已取消收服：" + p.name, Toast.LENGTH_SHORT).show();
-        } else {
-            caughtSet.add(p.id);
-            Toast.makeText(context, "✅ 已收服：" + p.name, Toast.LENGTH_SHORT).show();
-        }
-        prefs.edit().putStringSet("caughtList", caughtSet).apply();
     }
 
     public Set<String> getCaughtSet() {
@@ -157,9 +171,18 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         notifyDataSetChanged();
     }
 
+    private void toggleCaught(Pokemon p) {
+        if (caughtSet.contains(p.id)) {
+            caughtSet.remove(p.id);
+        } else {
+            caughtSet.add(p.id);
+        }
+        prefs.edit().putStringSet("caughtList", caughtSet).apply();
+    }
+
     public static class PokemonViewHolder extends RecyclerView.ViewHolder {
-        ImageView imagePokemon;
-        TextView textId, textName;
+        ImageView imagePokemon, caughtStampImageView;
+        TextView textId, textName, textFormType;
         ImageView imageType1, imageType2;
 
         public PokemonViewHolder(@NonNull View itemView) {
@@ -167,6 +190,8 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             imagePokemon = itemView.findViewById(R.id.img_pokemon);
             textId = itemView.findViewById(R.id.tv_pokemon_number);
             textName = itemView.findViewById(R.id.tv_pokemon_name);
+            textFormType = itemView.findViewById(R.id.tv_form_type);
+            caughtStampImageView = itemView.findViewById(R.id.img_caught_stamp);
             imageType1 = itemView.findViewById(R.id.img_type1);
             imageType2 = itemView.findViewById(R.id.img_type2);
         }
