@@ -51,8 +51,8 @@
                 android:id="@+id/img_pokemon"
                 android:layout_width="110dp"
                 android:layout_height="100dp"
+                android:layout_marginTop="33dp"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
                 android:scaleType="fitCenter"
                 android:contentDescription="@null" />
         </RelativeLayout>
@@ -63,6 +63,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="8dp"
+            android:layout_marginTop="-6dp"
             android:background="@drawable/bottom_rounded_background">
 
             <TextView
@@ -75,42 +76,54 @@
                 android:textColor="#000000"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="0dp" />
 
-            <LinearLayout
+            <!-- 屬性＋編號排版區 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
                 android:layout_marginTop="2dp">
 
+                <!-- 編號靠左 -->
                 <TextView
                     android:id="@+id/tv_pokemon_number"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
                     android:text="#0001"
                     android:textColor="#555555"
                     android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
-                <ImageView
-                    android:id="@+id/img_type1"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:layout_marginEnd="4dp"
-                    android:contentDescription="@null" />
-
+                <!-- 第二屬性（可見時靠最右） -->
                 <ImageView
                     android:id="@+id/img_type2"
                     android:layout_width="45dp"
                     android:layout_height="45dp"
                     android:visibility="gone"
-                    android:contentDescription="@null" />
-            </LinearLayout>
+                    android:contentDescription="@null"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <!-- 第一屬性 -->
+                <ImageView
+                    android:id="@+id/img_type1"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_marginEnd="4dp"
+                    android:contentDescription="@null"
+                    app:layout_constraintEnd_toStartOf="@id/img_type2"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+
 
 
 
