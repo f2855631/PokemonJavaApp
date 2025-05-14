@@ -88,11 +88,19 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         }
         String rawFormType = p.form_type != null ? p.form_type.trim().toLowerCase() : "";
         String displayFormType = formTypeMap.getOrDefault(rawFormType, "");
-        Log.d("FormTypeMapCheck", "form_type=" + rawFormType + ", mapped=" + displayFormType);
+        String formName = p.form_name != null ? p.form_name.trim() : "";
 
-        if (!displayFormType.equals("")) {
-            holder.textFormType.setVisibility(View.VISIBLE);
+// 優先：form_type 映射成功
+        if (!displayFormType.isEmpty()) {
             holder.textFormType.setText(displayFormType);
+            holder.textFormType.setVisibility(View.VISIBLE);
+
+// 其次：form_type 是空、但 form_name 有內容
+        } else if (!formName.isEmpty()) {
+            holder.textFormType.setText(formName);
+            holder.textFormType.setVisibility(View.VISIBLE);
+
+// 兩者皆無：不顯示
         } else {
             holder.textFormType.setVisibility(View.GONE);
         }

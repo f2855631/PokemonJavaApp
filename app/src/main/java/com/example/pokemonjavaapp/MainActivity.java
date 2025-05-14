@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
             popup.getMenu().add(makeStyledText("世代/地區"));
             popup.getMenu().add(makeStyledText("Mega進化"));
             popup.getMenu().add(makeStyledText("超極巨化"));
+            popup.getMenu().add(makeStyledText("其他型態"));
 
             popup.setOnMenuItemClickListener(menuItem -> {
                 String title = menuItem.getTitle().toString().replace(" ", "").trim();
@@ -119,8 +120,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if (title.contains("主畫面")) {
                     adapter.updateList(new ArrayList<>(originalList));
+
                 } else if (title.contains("世代/地區")) {
                     fetchGenerationListAndShowDialog();
+
                 } else if (title.contains("Mega進化")) {
                     List<Pokemon> filtered = new ArrayList<>();
                     for (Pokemon p : originalList) {
@@ -129,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     adapter.updateList(filtered);
+
                 } else if (title.contains("超極巨化")) {
                     List<Pokemon> filtered = new ArrayList<>();
                     for (Pokemon p : originalList) {
@@ -137,6 +141,22 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     adapter.updateList(filtered);
+
+                } else if (title.contains("其他型態")) {
+                    List<Pokemon> filtered = new ArrayList<>();
+                    for (Pokemon p : originalList) {
+                        boolean hasFormName = p.form_name != null && !p.form_name.trim().isEmpty();
+                        String formType = p.form_type != null ? p.form_type.toLowerCase() : "";
+                        boolean isExcluded = formType.equals("mega") || formType.equals("gmax") ||
+                                formType.equals("alola") || formType.equals("galar") ||
+                                formType.equals("hisui") || formType.equals("paldea");
+
+                        if (hasFormName && !isExcluded) {
+                            filtered.add(p);
+                        }
+                    }
+                    adapter.updateList(filtered);
+
                 } else {
                     SharedPreferences prefs = getSharedPreferences("pokemonPrefs", MODE_PRIVATE);
                     Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
@@ -151,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return true;
             });
+
 
             popup.show();
         });

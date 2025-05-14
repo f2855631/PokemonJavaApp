@@ -11,6 +11,7 @@ public class Pokemon implements Parcelable {
     public String id;
     public int sub_id;
     public String name;
+    public String form_name;
     public String form_type;
     public String category;
     public String gender;
