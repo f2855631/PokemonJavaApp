@@ -49,11 +49,12 @@
 
             <ImageView
                 android:id="@+id/img_pokemon"
-                android:layout_width="110dp"
-                android:layout_height="100dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
+                android:layout_width="78dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_margin="10dp"
                 android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
                 android:contentDescription="@null" />
         </RelativeLayout>
 
