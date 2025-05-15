@@ -27,6 +27,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
         recyclerView = findViewById(R.id.pokemonRecyclerView);
         int spanCount = calculateSpanCount();
         GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
@@ -62,18 +65,11 @@ public class MainActivity extends AppCompatActivity {
         adapter = new PokemonAdapter(MainActivity.this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        PokemonFetcher.fetchPokemonData(new PokemonFetcher.OnDataFetched() {
-            @Override
-            public void onSuccess(List<Pokemon> pokemonList) {
-                fullPokemonList = new ArrayList<>(pokemonList);
-                originalList = new ArrayList<>(pokemonList);
-                adapter.updateList(fullPokemonList);
-            }
+        loadPokemonData();
 
-            @Override
-            public void onFailure(String error) {
-                Log.e("POKEMON", "抓資料失敗: " + error);
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            loadPokemonData();
+            swipeRefreshLayout.setRefreshing(false);
         });
 
         SearchView searchView = findViewById(R.id.searchView);
@@ -174,6 +170,22 @@ public class MainActivity extends AppCompatActivity {
             });
 
             popup.show();
+        });
+    }
+
+    private void loadPokemonData() {
+        PokemonFetcher.fetchPokemonData(new PokemonFetcher.OnDataFetched() {
+            @Override
+            public void onSuccess(List<Pokemon> pokemonList) {
+                fullPokemonList = new ArrayList<>(pokemonList);
+                originalList = new ArrayList<>(pokemonList);
+                adapter.updateList(fullPokemonList);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.e("POKEMON", "抓資料失敗: " + error);
+            }
         });
     }
 

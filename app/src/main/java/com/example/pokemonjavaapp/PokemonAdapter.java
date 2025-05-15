@@ -18,6 +18,7 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -137,7 +138,16 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         }
 
         String imageUrl = "https://raw.githubusercontent.com/f2855631/pokemon-crawler/main/" + p.image;
-        Glide.with(context).load(imageUrl).into(holder.imagePokemon);
+        Glide.with(context)
+                .load(imageUrl)
+                .override(90, 90)
+                .centerCrop()
+                .thumbnail(0.1f)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .skipMemoryCache(false)
+                .placeholder(android.R.drawable.stat_sys_download)
+                .error(android.R.drawable.stat_notify_error)
+                .into(holder.imagePokemon);
 
         String caughtKey = getCaughtKey(p);
         if (caughtSet.contains(caughtKey)) {

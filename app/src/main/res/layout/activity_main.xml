@@ -1,60 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
-    <!-- 🔍+☰ 搜尋列與漢堡列 -->
-    <LinearLayout
-        android:id="@+id/searchRow"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingTop="16dp"
-        android:layout_margin="8dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <!-- 內層原本的 ConstraintLayout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background"
+        android:fitsSystemWindows="true">
 
-        <!-- 🔍 搜尋框 -->
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
+        <!-- 🔍+☰ 搜尋列與漢堡列 -->
+        <LinearLayout
+            android:id="@+id/searchRow"
             android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/search_box_background"
-            android:iconifiedByDefault="true"
-            android:inputType="text"
-            android:maxWidth="10000dp"
-            android:queryHint="使用名稱或圖鑑編號搜尋" />
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:layout_margin="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!-- ☰ 漢堡選單 -->
-        <ImageView
-            android:id="@+id/menu_filter"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Menu"
-            android:padding="8dp"
-            android:src="@drawable/ic_menu" />
-    </LinearLayout>
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/search_box_background"
+                android:iconifiedByDefault="true"
+                android:inputType="text"
+                android:maxWidth="10000dp"
+                android:queryHint="使用名稱或圖鑑編號搜尋" />
 
-    <!-- 📃 可快速滑動的寶可夢列表 -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pokemonRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scrollbars="vertical"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/searchRow"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+            <ImageView
+                android:id="@+id/menu_filter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Menu"
+                android:padding="8dp"
+                android:src="@drawable/ic_menu" />
+        </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pokemonRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scrollbars="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:clipToPadding="false"
+            app:layout_constraintTop_toBottomOf="@id/searchRow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
