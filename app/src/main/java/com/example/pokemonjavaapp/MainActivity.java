@@ -162,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
                     Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
                     List<Pokemon> resultList = new ArrayList<>();
                     for (Pokemon p : originalList) {
-                        boolean isCaught = caughtSet.contains(p.id);
+                        String key = p.id + "-" + p.sub_id;
+                        boolean isCaught = caughtSet.contains(key);
                         if ((title.contains("已收服") && isCaught) || (title.contains("未收服") && !isCaught)) {
                             resultList.add(p);
                         }
@@ -172,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             });
 
-
             popup.show();
         });
     }
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
     private int calculateSpanCount() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int itemWidth = 180; // 卡片寬度（包含 margin）
+        int itemWidth = 180;
         return Math.max(2, (int) (dpWidth / itemWidth));
     }
 

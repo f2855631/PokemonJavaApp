@@ -86,21 +86,17 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         } catch (NumberFormatException e) {
             holder.textId.setText(p.id);
         }
+
         String rawFormType = p.form_type != null ? p.form_type.trim().toLowerCase() : "";
         String displayFormType = formTypeMap.getOrDefault(rawFormType, "");
         String formName = p.form_name != null ? p.form_name.trim() : "";
 
-// 優先：form_type 映射成功
         if (!displayFormType.isEmpty()) {
             holder.textFormType.setText(displayFormType);
             holder.textFormType.setVisibility(View.VISIBLE);
-
-// 其次：form_type 是空、但 form_name 有內容
         } else if (!formName.isEmpty()) {
             holder.textFormType.setText(formName);
             holder.textFormType.setVisibility(View.VISIBLE);
-
-// 兩者皆無：不顯示
         } else {
             holder.textFormType.setVisibility(View.GONE);
         }
@@ -143,7 +139,8 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         String imageUrl = "https://raw.githubusercontent.com/f2855631/pokemon-crawler/main/" + p.image;
         Glide.with(context).load(imageUrl).into(holder.imagePokemon);
 
-        if (caughtSet.contains(p.id)) {
+        String caughtKey = getCaughtKey(p);
+        if (caughtSet.contains(caughtKey)) {
             holder.itemView.setBackgroundColor(Color.parseColor("#D0F0C0"));
             holder.caughtStampImageView.setVisibility(View.VISIBLE);
         } else {
@@ -164,6 +161,20 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         });
     }
 
+    private String getCaughtKey(Pokemon p) {
+        return p.id + "-" + p.sub_id;
+    }
+
+    private void toggleCaught(Pokemon p) {
+        String key = getCaughtKey(p);
+        if (caughtSet.contains(key)) {
+            caughtSet.remove(key);
+        } else {
+            caughtSet.add(key);
+        }
+        prefs.edit().putStringSet("caughtList", caughtSet).apply();
+    }
+
     public Set<String> getCaughtSet() {
         return new HashSet<>(caughtSet);
     }
@@ -177,15 +188,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         pokemonList.clear();
         pokemonList.addAll(newList);
         notifyDataSetChanged();
-    }
-
-    private void toggleCaught(Pokemon p) {
-        if (caughtSet.contains(p.id)) {
-            caughtSet.remove(p.id);
-        } else {
-            caughtSet.add(p.id);
-        }
-        prefs.edit().putStringSet("caughtList", caughtSet).apply();
     }
 
     public static class PokemonViewHolder extends RecyclerView.ViewHolder {
