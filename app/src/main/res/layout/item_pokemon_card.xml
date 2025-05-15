@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,55 +14,55 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- 上半圖區 -->
-        <LinearLayout
+        <!-- 上半圖區（FrameLayout 包住圖片和印章）-->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="140dp"
-            android:orientation="vertical"
-            android:gravity="center"
             android:background="@drawable/fill_outer_gap">
 
-            <TextView
-                android:id="@+id/tv_form_type"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:padding="4dp"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_gravity="center">
+                <!-- 型態名稱 -->
+                <TextView
+                    android:id="@+id/tv_form_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:padding="4dp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
+                <!-- 寶可夢圖片 -->
                 <ImageView
                     android:id="@+id/img_pokemon"
                     android:layout_width="90dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    android:layout_gravity="center"
                     android:scaleType="fitCenter"
                     android:contentDescription="@null" />
+            </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/img_caught_stamp"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_gravity="bottom|start"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:visibility="gone"
-                    android:src="@drawable/caught_stamp"
-                    android:contentDescription="已收服印章" />
-            </FrameLayout>
-        </LinearLayout>
+            <!-- ✅ 印章：對齊圖片左下角 -->
+            <ImageView
+                android:id="@+id/img_caught_stamp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="bottom|start"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="4dp"
+                android:visibility="gone"
+                android:src="@drawable/caught_stamp"
+                android:contentDescription="已收服印章" />
+        </FrameLayout>
 
         <!-- 下半資訊區 -->
         <LinearLayout
@@ -71,6 +72,7 @@
             android:padding="8dp"
             android:background="@drawable/bottom_rounded_background">
 
+            <!-- 名稱 -->
             <TextView
                 android:id="@+id/tv_pokemon_name"
                 android:layout_width="match_parent"
@@ -82,6 +84,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <!-- 編號與屬性 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -100,21 +103,22 @@
 
                 <ImageView
                     android:id="@+id/img_type1"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_marginEnd="4dp"
                     android:contentDescription="@null" />
 
                 <ImageView
                     android:id="@+id/img_type2"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:visibility="gone"
                     android:contentDescription="@null" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+
 
 
 
