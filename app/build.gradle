@@ -15,7 +15,14 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def appName = "寶可夢圖鑑" // ← APK 名稱開頭，自訂
+            def version = variant.versionName
+            def buildType = variant.buildType.name
+            outputFileName = "${appName}_v${version}_${buildType}.apk"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
