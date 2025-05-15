@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PokemonJavaApp</string>
+    <string name="app_name">寶可夢圖鑑</string>
     <string name="navigation_drawer_open">開啟選單</string>
     <string name="navigation_drawer_close">關閉選單</string>
     <string name="menu_filter">選單</string>
