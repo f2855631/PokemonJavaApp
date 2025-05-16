@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private PokemonAdapter adapter;
     private List<Pokemon> fullPokemonList = new ArrayList<>();
     private List<Pokemon> originalList = new ArrayList<>();
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         recyclerView = findViewById(R.id.pokemonRecyclerView);
+        progressBar = findViewById(R.id.progressBar);
 
         int spanCount = calculateSpanCount();
         GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
@@ -74,15 +77,12 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (recyclerView.canScrollVertically(-1)) {
-                    swipeRefreshLayout.setEnabled(false);
-                } else {
-                    swipeRefreshLayout.setEnabled(true);
-                }
+                swipeRefreshLayout.setEnabled(!recyclerView.canScrollVertically(-1));
             }
         });
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
+            progressBar.setVisibility(View.VISIBLE);
             loadPokemonData();
             swipeRefreshLayout.setRefreshing(false);
         });
@@ -115,80 +115,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ImageView menuIcon = findViewById(R.id.menu_filter);
-        menuIcon.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(MainActivity.this, menuIcon, Gravity.END);
-            popup.getMenu().add(makeStyledText("主畫面"));
-            popup.getMenu().add(makeStyledText("已收服"));
-            popup.getMenu().add(makeStyledText("未收服"));
-            popup.getMenu().add(makeStyledText("世代/地區"));
-            popup.getMenu().add(makeStyledText("Mega進化"));
-            popup.getMenu().add(makeStyledText("超極巨化"));
-            popup.getMenu().add(makeStyledText("其他型態"));
+        menuIcon.setOnClickListener(v -> showFilterMenu());
 
-            popup.setOnMenuItemClickListener(menuItem -> {
-                String title = menuItem.getTitle().toString().replace(" ", "").trim();
-                if (adapter == null) return false;
-
-                if (title.contains("主畫面")) {
-                    adapter.updateList(new ArrayList<>(originalList));
-                } else if (title.contains("世代/地區")) {
-                    fetchGenerationListAndShowDialog();
-                } else if (title.contains("Mega進化")) {
-                    List<Pokemon> filtered = new ArrayList<>();
-                    for (Pokemon p : originalList) {
-                        if (p.form_type != null && p.form_type.toLowerCase().contains("mega")) {
-                            filtered.add(p);
-                        }
-                    }
-                    adapter.updateList(filtered);
-                } else if (title.contains("超極巨化")) {
-                    List<Pokemon> filtered = new ArrayList<>();
-                    for (Pokemon p : originalList) {
-                        if (p.form_type != null && p.form_type.toLowerCase().contains("gmax")) {
-                            filtered.add(p);
-                        }
-                    }
-                    adapter.updateList(filtered);
-                } else if (title.contains("其他型態")) {
-                    List<Pokemon> filtered = new ArrayList<>();
-                    for (Pokemon p : originalList) {
-                        boolean hasFormName = p.form_name != null && !p.form_name.trim().isEmpty();
-                        String formType = p.form_type != null ? p.form_type.toLowerCase() : "";
-                        boolean isExcluded = formType.equals("mega") || formType.equals("gmax") ||
-                                formType.equals("alola") || formType.equals("galar") ||
-                                formType.equals("hisui") || formType.equals("paldea");
-                        if (hasFormName && !isExcluded) {
-                            filtered.add(p);
-                        }
-                    }
-                    adapter.updateList(filtered);
-                } else {
-                    SharedPreferences prefs = getSharedPreferences("pokemonPrefs", MODE_PRIVATE);
-                    Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>())) ;
-                    List<Pokemon> resultList = new ArrayList<>();
-                    for (Pokemon p : originalList) {
-                        String key = p.id + "-" + p.sub_id;
-                        boolean isCaught = caughtSet.contains(key);
-                        if ((title.contains("已收服") && isCaught) || (title.contains("未收服") && !isCaught)) {
-                            resultList.add(p);
-                        }
-                    }
-                    adapter.updateList(resultList);
-                }
-                return true;
-            });
-
-            popup.show();
-        });
-
+        progressBar.setVisibility(View.VISIBLE);
         loadPokemonData();
     }
 
     private int calculateSpanCount() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int itemWidth = 180;
-        return Math.max(2, (int) (dpWidth / itemWidth));
+        return Math.max(2, (int) (dpWidth / 180));
     }
 
     private void loadPokemonData() {
@@ -198,11 +134,13 @@ public class MainActivity extends AppCompatActivity {
                 fullPokemonList = new ArrayList<>(pokemonList);
                 originalList = new ArrayList<>(pokemonList);
                 adapter.updateList(fullPokemonList);
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(String error) {
                 Log.e("POKEMON", "抓資料失敗: " + error);
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -221,16 +159,7 @@ public class MainActivity extends AppCompatActivity {
             for (Pokemon p : originalList) {
                 boolean matchName = p.name != null && p.name.toLowerCase().contains(lowerQuery);
                 boolean matchId = p.id != null && p.id.contains(lowerQuery.replace("#", ""));
-                boolean matchType = false;
-
-                if (p.type != null) {
-                    for (String t : p.type) {
-                        if (t != null && t.toLowerCase().contains(lowerQuery)) {
-                            matchType = true;
-                            break;
-                        }
-                    }
-                }
+                boolean matchType = p.type != null && p.type.stream().anyMatch(t -> t != null && t.toLowerCase().contains(lowerQuery));
 
                 if (matchName || matchId || matchType) {
                     filtered.add(p);
@@ -249,9 +178,73 @@ public class MainActivity extends AppCompatActivity {
         return ss;
     }
 
+    private void showFilterMenu() {
+        ImageView menuIcon = findViewById(R.id.menu_filter);
+        PopupMenu popup = new PopupMenu(MainActivity.this, menuIcon, Gravity.END);
+        popup.getMenu().add(makeStyledText("主畫面"));
+        popup.getMenu().add(makeStyledText("已收服"));
+        popup.getMenu().add(makeStyledText("未收服"));
+        popup.getMenu().add(makeStyledText("世代/地區"));
+        popup.getMenu().add(makeStyledText("Mega進化"));
+        popup.getMenu().add(makeStyledText("超極巨化"));
+        popup.getMenu().add(makeStyledText("其他型態"));
+
+        popup.setOnMenuItemClickListener(menuItem -> {
+            String title = menuItem.getTitle().toString().replace(" ", "").trim();
+            if (adapter == null) return false;
+
+            if (title.contains("主畫面")) {
+                adapter.updateList(new ArrayList<>(originalList));
+            } else if (title.contains("世代/地區")) {
+                fetchGenerationListAndShowDialog();
+            } else if (title.contains("Mega進化")) {
+                filterFormType("mega");
+            } else if (title.contains("超極巨化")) {
+                filterFormType("gmax");
+            } else if (title.contains("其他型態")) {
+                List<Pokemon> filtered = new ArrayList<>();
+                for (Pokemon p : originalList) {
+                    boolean hasFormName = p.form_name != null && !p.form_name.trim().isEmpty();
+                    String formType = p.form_type != null ? p.form_type.toLowerCase() : "";
+                    boolean isExcluded = formType.equals("mega") || formType.equals("gmax") ||
+                            formType.equals("alola") || formType.equals("galar") ||
+                            formType.equals("hisui") || formType.equals("paldea");
+                    if (hasFormName && !isExcluded) {
+                        filtered.add(p);
+                    }
+                }
+                adapter.updateList(filtered);
+            } else {
+                SharedPreferences prefs = getSharedPreferences("pokemonPrefs", MODE_PRIVATE);
+                Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
+                List<Pokemon> resultList = new ArrayList<>();
+                for (Pokemon p : originalList) {
+                    String key = p.id + "-" + p.sub_id;
+                    boolean isCaught = caughtSet.contains(key);
+                    if ((title.contains("已收服") && isCaught) || (title.contains("未收服") && !isCaught)) {
+                        resultList.add(p);
+                    }
+                }
+                adapter.updateList(resultList);
+            }
+            return true;
+        });
+
+        popup.show();
+    }
+
+    private void filterFormType(String keyword) {
+        List<Pokemon> filtered = new ArrayList<>();
+        for (Pokemon p : originalList) {
+            if (p.form_type != null && p.form_type.toLowerCase().contains(keyword)) {
+                filtered.add(p);
+            }
+        }
+        adapter.updateList(filtered);
+    }
+
     private void fetchGenerationListAndShowDialog() {
         OkHttpClient client = new OkHttpClient();
-
         Request request = new Request.Builder()
                 .url("https://raw.githubusercontent.com/f2855631/pokemon-crawler/refs/heads/main/pokemon_generations.json")
                 .build();
