@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.pokemonjavaapp">
 
-    <!-- ✅ 網路權限（給 Glide 用） -->
+    <!-- ✅ Glide 圖片載入需要網路權限 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -17,18 +17,21 @@
         android:theme="@style/Theme.PokemonJavaApp"
         tools:targetApi="31">
 
-        <!-- ✅ 詳細畫面 Activity 記得註冊 -->
-        <activity android:name=".PokemonDetailActivity" />
-
-        <!-- ✅ 主畫面（卡片列表） -->
-        <activity
-            android:name=".MainActivity"
+        <!-- ✅ 啟動畫面：改由 SplashActivity 做為進入點 -->
+        <activity android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- ✅ 主畫面（卡片列表） -->
+        <activity android:name=".MainActivity" />
+
+        <!-- ✅ 詳細畫面（單一寶可夢資訊） -->
+        <activity android:name=".PokemonDetailActivity" />
+
     </application>
 
 </manifest>
