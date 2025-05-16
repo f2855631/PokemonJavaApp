@@ -142,7 +142,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         String imageUrl = "https://raw.githubusercontent.com/f2855631/pokemon-crawler/main/" + p.image;
         Glide.with(context)
                 .load(imageUrl)
-                .override(90, 90)
                 .centerCrop()
                 .thumbnail(0.1f)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
