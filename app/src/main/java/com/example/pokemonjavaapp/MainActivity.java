@@ -3,6 +3,7 @@ package com.example.pokemonjavaapp;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Layout;
 import android.text.SpannableString;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -60,6 +62,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // ✅ 狀態列設為馬卡龍綠並設定黑色圖示（淺色底）
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.setStatusBarColor(Color.parseColor("#B8E8D2")); // 馬卡龍綠
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         recyclerView = findViewById(R.id.pokemonRecyclerView);
         progressBar = findViewById(R.id.progressBar);
@@ -70,9 +81,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new PokemonAdapter(MainActivity.this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        new me.zhanghai.android.fastscroll.FastScrollerBuilder(recyclerView)
-                .setThumbDrawable(ContextCompat.getDrawable(this, R.drawable.fastscroll_thumb))
-                .build();
+        new me.zhanghai.android.fastscroll.FastScrollerBuilder(recyclerView).build();
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

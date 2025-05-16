@@ -108,14 +108,17 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 返回按鈕（無背景） -->
-    <Button
+    <!-- 返回按鈕（改為使用圖片） -->
+    <ImageButton
         android:id="@+id/btnBackToMain"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
         android:layout_margin="16dp"
-        android:text="回主畫面"
-        android:textColor="#FFFFFF"
-        android:background="@null" />
+        android:background="@android:color/transparent"
+        android:src="@drawable/pokeball_back"
+        android:contentDescription="返回"
+        android:scaleType="fitCenter"
+        android:tint="@null" />
+
 </LinearLayout>

@@ -1,10 +1,11 @@
 package com.example.pokemonjavaapp;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.util.Log;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +20,13 @@ public class PokemonDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pokemon_detail);
+
+        // ✅ 將狀態列背景改為黑色
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(android.graphics.Color.BLACK);
+        }
+        ImageButton btnBackToMain = findViewById(R.id.btnBackToMain);
+        btnBackToMain.setOnClickListener(v -> finish());
 
         // 綁定畫面元件
         imageView = findViewById(R.id.imageView);
@@ -41,7 +49,7 @@ public class PokemonDetailActivity extends AppCompatActivity {
             textType.setText("屬性: " +
                     (pokemon.type != null && !pokemon.type.isEmpty()
                             ? String.join(", ", pokemon.type)
-                            : "無")); // ⬅ 注意這裡用的是 pokemon.type，不是 pokemon.types
+                            : "無"));
             textHeight.setText("身高: " + pokemon.height);
             textWeight.setText("體重: " + pokemon.weight);
             textCategory.setText("分類: " + pokemon.category);
@@ -57,15 +65,16 @@ public class PokemonDetailActivity extends AppCompatActivity {
                             ? String.join(", ", pokemon.weakness)
                             : "無"));
 
-            Button btnBackToMain = findViewById(R.id.btnBackToMain);
-            btnBackToMain.setOnClickListener(v -> {
-                finish(); // 👈 關閉當前畫面，回到 MainActivity
-            });
-            // 顯示圖片（從 github path 載入）
+            // 顯示圖片（從 GitHub path 載入）
             String imageUrl = "https://raw.githubusercontent.com/f2855631/pokemon-crawler/main/" + pokemon.image;
             Log.d("DETAIL_IMAGE_URL", "載入圖片網址: " + imageUrl);
             Glide.with(this).load(imageUrl).into(imageView);
-
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }
