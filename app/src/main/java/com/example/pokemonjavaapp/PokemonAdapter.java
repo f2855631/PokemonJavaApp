@@ -5,13 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -26,7 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder> {
+import me.zhanghai.android.fastscroll.PopupTextProvider;
+
+public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder>
+        implements PopupTextProvider {
+
     private final List<Pokemon> pokemonList;
     private final Context context;
     private final SharedPreferences prefs;
@@ -198,6 +200,18 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         pokemonList.clear();
         pokemonList.addAll(newList);
         notifyDataSetChanged();
+    }
+
+    @Override
+    public String getPopupText(View view, int position) {
+        if (position < 0 || position >= pokemonList.size()) return "";
+        Pokemon p = pokemonList.get(position);
+
+        try {
+            return String.format("%04d", Integer.parseInt(p.id));
+        } catch (NumberFormatException e) {
+            return p.id; // 萬一 id 不是數字
+        }
     }
 
     public static class PokemonViewHolder extends RecyclerView.ViewHolder {

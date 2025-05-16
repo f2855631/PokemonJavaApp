@@ -21,10 +21,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -57,15 +59,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
-
         recyclerView = findViewById(R.id.pokemonRecyclerView);
+
         int spanCount = calculateSpanCount();
         GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new PokemonAdapter(MainActivity.this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        loadPokemonData();
+        new me.zhanghai.android.fastscroll.FastScrollerBuilder(recyclerView)
+                .setThumbDrawable(ContextCompat.getDrawable(this, R.drawable.fastscroll_thumb))
+                .build();
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (recyclerView.canScrollVertically(-1)) {
+                    swipeRefreshLayout.setEnabled(false);
+                } else {
+                    swipeRefreshLayout.setEnabled(true);
+                }
+            }
+        });
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             loadPokemonData();
@@ -116,10 +131,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if (title.contains("主畫面")) {
                     adapter.updateList(new ArrayList<>(originalList));
-
                 } else if (title.contains("世代/地區")) {
                     fetchGenerationListAndShowDialog();
-
                 } else if (title.contains("Mega進化")) {
                     List<Pokemon> filtered = new ArrayList<>();
                     for (Pokemon p : originalList) {
@@ -128,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     adapter.updateList(filtered);
-
                 } else if (title.contains("超極巨化")) {
                     List<Pokemon> filtered = new ArrayList<>();
                     for (Pokemon p : originalList) {
@@ -137,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     adapter.updateList(filtered);
-
                 } else if (title.contains("其他型態")) {
                     List<Pokemon> filtered = new ArrayList<>();
                     for (Pokemon p : originalList) {
@@ -146,16 +157,14 @@ public class MainActivity extends AppCompatActivity {
                         boolean isExcluded = formType.equals("mega") || formType.equals("gmax") ||
                                 formType.equals("alola") || formType.equals("galar") ||
                                 formType.equals("hisui") || formType.equals("paldea");
-
                         if (hasFormName && !isExcluded) {
                             filtered.add(p);
                         }
                     }
                     adapter.updateList(filtered);
-
                 } else {
                     SharedPreferences prefs = getSharedPreferences("pokemonPrefs", MODE_PRIVATE);
-                    Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
+                    Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>())) ;
                     List<Pokemon> resultList = new ArrayList<>();
                     for (Pokemon p : originalList) {
                         String key = p.id + "-" + p.sub_id;
@@ -171,6 +180,15 @@ public class MainActivity extends AppCompatActivity {
 
             popup.show();
         });
+
+        loadPokemonData();
+    }
+
+    private int calculateSpanCount() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int itemWidth = 180;
+        return Math.max(2, (int) (dpWidth / itemWidth));
     }
 
     private void loadPokemonData() {
@@ -187,21 +205,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("POKEMON", "抓資料失敗: " + error);
             }
         });
-    }
-
-    private int calculateSpanCount() {
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int itemWidth = 180;
-        return Math.max(2, (int) (dpWidth / itemWidth));
-    }
-
-    private SpannableString makeStyledText(String text) {
-        SpannableString ss = new SpannableString(text);
-        ss.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        ss.setSpan(new RelativeSizeSpan(1.3f), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        ss.setSpan(new StyleSpan(Typeface.BOLD), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return ss;
     }
 
     public void filterPokemon(String query) {
@@ -236,6 +239,14 @@ public class MainActivity extends AppCompatActivity {
 
             adapter.updateList(filtered);
         }
+    }
+
+    private SpannableString makeStyledText(String text) {
+        SpannableString ss = new SpannableString(text);
+        ss.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new RelativeSizeSpan(1.3f), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new StyleSpan(Typeface.BOLD), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return ss;
     }
 
     private void fetchGenerationListAndShowDialog() {
