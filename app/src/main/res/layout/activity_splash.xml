@@ -1,8 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  啟動畫面（Splash Screen）版面
+  顯示中央 Logo，背景為白色，適合初次進入 App 時顯示
+-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"> <!-- 你想要的背景色 -->
+    android:background="#FFFFFF"> <!-- 設定背景為白色 -->
 
+    <!-- 中央顯示 App 標誌圖片 -->
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
