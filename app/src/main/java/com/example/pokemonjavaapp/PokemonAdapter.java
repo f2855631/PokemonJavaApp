@@ -29,11 +29,12 @@ import me.zhanghai.android.fastscroll.PopupTextProvider;
 public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder>
         implements PopupTextProvider {
 
-    private final List<Pokemon> pokemonList;
+    private final List<Pokemon> pokemonList; // 顯示的寶可夢清單
     private final Context context;
-    private final SharedPreferences prefs;
-    private final Set<String> caughtSet;
+    private final SharedPreferences prefs; // 用來記錄已收服狀態
+    private final Set<String> caughtSet; // 快取已收服的清單
 
+    // 中文屬性對應英文圖檔名稱
     private static final Map<String, String> typeMap = new HashMap<String, String>() {{
         put("一般", "normal");
         put("火", "fire");
@@ -55,6 +56,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         put("妖精", "fairy");
     }};
 
+    // 型態英文對應顯示名稱
     private static final Map<String, String> formTypeMap = new HashMap<String, String>() {{
         put("alola", "阿羅拉的樣子");
         put("galar", "伽勒爾的樣子");
@@ -83,6 +85,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         Pokemon p = pokemonList.get(position);
 
+        // 設定名稱與編號
         holder.textName.setText(p.name);
         try {
             holder.textId.setText(String.format("%04d", Integer.parseInt(p.id)));
@@ -90,6 +93,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             holder.textId.setText(p.id);
         }
 
+        // 顯示型態（Mega、地區型態或特殊 form_name）
         String rawFormType = p.form_type != null ? p.form_type.trim().toLowerCase() : "";
         String displayFormType = formTypeMap.getOrDefault(rawFormType, "");
         String formName = p.form_name != null ? p.form_name.trim() : "";
@@ -104,6 +108,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             holder.textFormType.setVisibility(View.GONE);
         }
 
+        // 顯示屬性圖示（最多兩個）
         if (p.type != null && !p.type.isEmpty()) {
             String type1Eng = typeMap.getOrDefault(p.type.get(0), null);
             if (type1Eng != null) {
@@ -139,6 +144,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             holder.imageType2.setVisibility(View.GONE);
         }
 
+        // 載入圖片（使用 GitHub 圖片來源）
         String imageUrl = "https://raw.githubusercontent.com/f2855631/pokemon-crawler/main/" + p.image;
         Glide.with(context)
                 .load(imageUrl)
@@ -150,21 +156,24 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
                 .error(android.R.drawable.stat_notify_error)
                 .into(holder.imagePokemon);
 
+        // 根據是否收服改變卡片背景與印章
         String caughtKey = getCaughtKey(p);
         if (caughtSet.contains(caughtKey)) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#D0F0C0"));
+            holder.itemView.setBackgroundColor(Color.parseColor("#D0F0C0")); // 淺綠色
             holder.caughtStampImageView.setVisibility(View.VISIBLE);
         } else {
             holder.itemView.setBackgroundColor(Color.WHITE);
             holder.caughtStampImageView.setVisibility(View.GONE);
         }
 
+        // 點擊卡片開啟詳細頁
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, PokemonDetailActivity.class);
             intent.putExtra("pokemon", p);
             context.startActivity(intent);
         });
 
+        // 長按切換收服狀態
         holder.itemView.setOnLongClickListener(v -> {
             toggleCaught(p);
             notifyItemChanged(position);
@@ -172,10 +181,12 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         });
     }
 
+    // 取得儲存用 key（id-sub_id）
     private String getCaughtKey(Pokemon p) {
         return p.id + "-" + p.sub_id;
     }
 
+    // 切換收服狀態並儲存
     private void toggleCaught(Pokemon p) {
         String key = getCaughtKey(p);
         if (caughtSet.contains(key)) {
@@ -195,24 +206,26 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         return pokemonList.size();
     }
 
+    // 更新資料清單
     public void updateList(List<Pokemon> newList) {
         pokemonList.clear();
         pokemonList.addAll(newList);
         notifyDataSetChanged();
     }
 
+    // 快速捲動顯示用的提示文字（顯示編號）
     @Override
     public String getPopupText(View view, int position) {
         if (position < 0 || position >= pokemonList.size()) return "";
         Pokemon p = pokemonList.get(position);
-
         try {
             return String.format("%04d", Integer.parseInt(p.id));
         } catch (NumberFormatException e) {
-            return p.id; // 萬一 id 不是數字
+            return p.id;
         }
     }
 
+    // ViewHolder：卡片內各個元件
     public static class PokemonViewHolder extends RecyclerView.ViewHolder {
         ImageView imagePokemon, caughtStampImageView;
         TextView textId, textName, textFormType;
