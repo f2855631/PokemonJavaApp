@@ -51,38 +51,41 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private PokemonAdapter adapter;
-    private List<Pokemon> fullPokemonList = new ArrayList<>();
-    private List<Pokemon> originalList = new ArrayList<>();
-    private ProgressBar progressBar;
+    private RecyclerView recyclerView; // 顯示寶可夢清單的 RecyclerView
+    private PokemonAdapter adapter; // 自訂的 Adapter
+    private List<Pokemon> fullPokemonList = new ArrayList<>(); // 全部寶可夢資料
+    private List<Pokemon> originalList = new ArrayList<>(); // 原始列表（用於搜尋與重設）
+    private ProgressBar progressBar; // 載入資料時顯示進度
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // ✅ 狀態列設為馬卡龍綠並設定黑色圖示（淺色底）
+        // 設定狀態列顏色與圖示樣式（馬卡龍綠 + 黑色文字）
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
-            window.setStatusBarColor(Color.parseColor("#B8E8D2")); // 馬卡龍綠
+            window.setStatusBarColor(Color.parseColor("#B8E8D2"));
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
+        // 初始化畫面元件
         SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         recyclerView = findViewById(R.id.pokemonRecyclerView);
         progressBar = findViewById(R.id.progressBar);
 
+        // 根據螢幕寬度決定欄位數
         int spanCount = calculateSpanCount();
-        GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
         adapter = new PokemonAdapter(MainActivity.this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
+        // 加入快速滾動功能
         new me.zhanghai.android.fastscroll.FastScrollerBuilder(recyclerView).build();
 
+        // 滾動到頂時才允許下拉刷新
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -90,12 +93,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 下拉刷新時重新載入資料
         swipeRefreshLayout.setOnRefreshListener(() -> {
             progressBar.setVisibility(View.VISIBLE);
             loadPokemonData();
             swipeRefreshLayout.setRefreshing(false);
         });
 
+        // 初始化搜尋欄樣式與監聽器
         SearchView searchView = findViewById(R.id.searchView);
         searchView.setIconifiedByDefault(true);
         searchView.setQueryHint("使用名稱或圖鑑編號搜尋");
@@ -109,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             searchText.setHintTextColor(Color.GRAY);
         }
 
+        // 設定搜尋文字變更監聽
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -123,19 +129,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 設定選單按鈕事件
         ImageView menuIcon = findViewById(R.id.menu_filter);
         menuIcon.setOnClickListener(v -> showFilterMenu());
 
+        // 載入初始資料
         progressBar.setVisibility(View.VISIBLE);
         loadPokemonData();
     }
 
+    // 根據螢幕寬度動態調整欄位數量
     private int calculateSpanCount() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         return Math.max(2, (int) (dpWidth / 180));
     }
 
+    // 從網路載入寶可夢資料
     private void loadPokemonData() {
         PokemonFetcher.fetchPokemonData(new PokemonFetcher.OnDataFetched() {
             @Override
@@ -154,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // 搜尋篩選邏輯：支援名稱、編號、屬性
     public void filterPokemon(String query) {
         if (adapter != null && originalList != null) {
             String trimmedQuery = query.trim();
@@ -179,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 建立彈出選單選項樣式（字體加粗、置中、放大）
     private SpannableString makeStyledText(String text) {
         SpannableString ss = new SpannableString(text);
         ss.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -187,9 +199,12 @@ public class MainActivity extends AppCompatActivity {
         return ss;
     }
 
+    // 顯示分類選單邏輯
     private void showFilterMenu() {
         ImageView menuIcon = findViewById(R.id.menu_filter);
         PopupMenu popup = new PopupMenu(MainActivity.this, menuIcon, Gravity.END);
+
+        // 加入選單項目
         popup.getMenu().add(makeStyledText("主畫面"));
         popup.getMenu().add(makeStyledText("已收服"));
         popup.getMenu().add(makeStyledText("未收服"));
@@ -198,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
         popup.getMenu().add(makeStyledText("超極巨化"));
         popup.getMenu().add(makeStyledText("其他型態"));
 
+        // 設定每個選項的處理邏輯
         popup.setOnMenuItemClickListener(menuItem -> {
             String title = menuItem.getTitle().toString().replace(" ", "").trim();
             if (adapter == null) return false;
@@ -225,7 +241,8 @@ public class MainActivity extends AppCompatActivity {
                 adapter.updateList(filtered);
             } else {
                 SharedPreferences prefs = getSharedPreferences("pokemonPrefs", MODE_PRIVATE);
-                Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()));
+                Set<String> caughtSet = new HashSet<>(prefs.getStringSet("caughtList", new HashSet<>()))
+                        ;
                 List<Pokemon> resultList = new ArrayList<>();
                 for (Pokemon p : originalList) {
                     String key = p.id + "-" + p.sub_id;
@@ -242,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
         popup.show();
     }
 
+    // 篩選特定型態的寶可夢（例如 mega、gmax）
     private void filterFormType(String keyword) {
         List<Pokemon> filtered = new ArrayList<>();
         for (Pokemon p : originalList) {
@@ -252,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.updateList(filtered);
     }
 
+    // 從 GitHub 載入分類資料並顯示彈窗
     private void fetchGenerationListAndShowDialog() {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
@@ -284,6 +303,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // 顯示地區選擇彈窗
     private void showGenerationDialog(List<String> categories, GenerationCategory[] generationList) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
 
@@ -321,6 +341,7 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    // 根據世代/地區編號範圍篩選寶可夢
     private void filterPokemonByRange(String range) {
         String[] parts = range.replace("#", "").split(" - ");
         int start = Integer.parseInt(parts[0]);
@@ -337,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.updateList(filtered);
     }
 
+    // 世代資料結構類別
     public static class GenerationCategory {
         @SerializedName("世代")
         public String generation;
