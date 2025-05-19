@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 
 public class PokemonDetailActivity extends AppCompatActivity {
 
+    // 宣告畫面元件
     ImageView imageView;
     TextView textName, textId, textHeight, textWeight, textCategory, textGender, textAbilities, textWeaknesses, textType;
 
@@ -21,10 +22,12 @@ public class PokemonDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pokemon_detail);
 
-        // ✅ 將狀態列背景改為黑色
+        // ✅ 將狀態列背景設為黑色
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(android.graphics.Color.BLACK);
         }
+
+        // 返回主畫面的按鈕
         ImageButton btnBackToMain = findViewById(R.id.btnBackToMain);
         btnBackToMain.setOnClickListener(v -> finish());
 
@@ -38,18 +41,21 @@ public class PokemonDetailActivity extends AppCompatActivity {
         textGender = findViewById(R.id.textGender);
         textAbilities = findViewById(R.id.textAbilities);
         textWeaknesses = findViewById(R.id.textWeaknesses);
-        textType = findViewById(R.id.textTypes); // 對應 XML 中的 id
+        textType = findViewById(R.id.textTypes); // 注意：XML 中 id 應為 textTypes
 
-        // 取得傳進來的寶可夢物件
+        // 從 Intent 取得傳遞過來的寶可夢資料
         Pokemon pokemon = getIntent().getParcelableExtra("pokemon");
 
         if (pokemon != null) {
+            // 設定寶可夢基本資訊到畫面上
             textName.setText(pokemon.name);
             textId.setText(pokemon.id);
+
             textType.setText("屬性: " +
                     (pokemon.type != null && !pokemon.type.isEmpty()
                             ? String.join(", ", pokemon.type)
                             : "無"));
+
             textHeight.setText("身高: " + pokemon.height);
             textWeight.setText("體重: " + pokemon.weight);
             textCategory.setText("分類: " + pokemon.category);
@@ -65,13 +71,14 @@ public class PokemonDetailActivity extends AppCompatActivity {
                             ? String.join(", ", pokemon.weakness)
                             : "無"));
 
-            // 顯示圖片（從 GitHub path 載入）
+            // 使用 Glide 載入圖片（來自 GitHub image 路徑）
             String imageUrl = "https://raw.githubusercontent.com/f2855631/pokemon-crawler/main/" + pokemon.image;
             Log.d("DETAIL_IMAGE_URL", "載入圖片網址: " + imageUrl);
             Glide.with(this).load(imageUrl).into(imageView);
         }
     }
 
+    // 返回支援（點選返回鍵也能關閉）
     @Override
     public boolean onSupportNavigateUp() {
         finish();
