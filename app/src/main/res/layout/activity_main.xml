@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+  主畫面 Layout，包含下拉更新、搜尋欄、分類按鈕、進度條與寶可夢清單
+-->
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- 使用 ConstraintLayout 管理主畫面位置 -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background"
         android:fitsSystemWindows="true">
 
-        <!-- ⏳ 顯示載入圈圈 -->
+        <!-- ⏳ 載入進度圈圈 -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="48dp"
@@ -25,7 +30,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="8dp" />
 
-        <!-- 🔍+☰ 搜尋列與漢堡列 -->
+        <!-- 🔍 搜尋列 + ☰ 分類選單按鈕（漢堡圖示） -->
         <LinearLayout
             android:id="@+id/searchRow"
             android:layout_width="0dp"
@@ -37,6 +42,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/progressBar">
 
+            <!-- 搜尋欄位 -->
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/searchView"
                 android:layout_width="0dp"
@@ -48,6 +54,7 @@
                 android:maxWidth="10000dp"
                 android:queryHint="使用名稱或圖鑑編號搜尋" />
 
+            <!-- 分類過濾選單按鈕（漢堡圖示） -->
             <ImageView
                 android:id="@+id/menu_filter"
                 android:layout_width="40dp"
@@ -59,7 +66,7 @@
                 android:src="@drawable/ic_menu" />
         </LinearLayout>
 
-        <!-- 🧩 寶可夢列表 -->
+        <!-- 🧩 顯示寶可夢的 RecyclerView 清單 -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/pokemonRecyclerView"
             android:layout_width="0dp"
