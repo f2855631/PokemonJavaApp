@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  詳細頁畫面 layout
+  顯示寶可夢圖片與各項資訊，包含名稱、身高體重、屬性、性別、分類等
+  最下方提供返回主畫面按鈕（使用圖片）
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/bg_splash">
 
-    <!-- 圖片區塊 -->
+    <!-- 📷 圖片區塊：顯示寶可夢圖片 -->
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
@@ -16,7 +21,7 @@
         android:contentDescription="寶可夢圖片"
         android:layout_marginTop="25dp" />
 
-    <!-- 資訊區塊 -->
+    <!-- 🧾 資訊區塊：放入 ScrollView，支援超出捲動 -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -32,83 +37,21 @@
             android:orientation="vertical"
             android:gravity="start">
 
-            <TextView
-                android:id="@+id/textName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/textId"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/textTypes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/textHeight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/textWeight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/textCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/textGender"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/textAbilities"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/textWeaknesses"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_marginBottom="4dp" />
+            <!-- 以下為各種資料欄位（名稱、編號、屬性、身高、體重、分類、性別、特性、弱點） -->
+            <TextView android:id="@+id/textName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="24sp" android:textStyle="bold" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
+            <TextView android:id="@+id/textId" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
+            <TextView android:id="@+id/textTypes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
+            <TextView android:id="@+id/textHeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
+            <TextView android:id="@+id/textWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
+            <TextView android:id="@+id/textCategory" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
+            <TextView android:id="@+id/textGender" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
+            <TextView android:id="@+id/textAbilities" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
+            <TextView android:id="@+id/textWeaknesses" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="16sp" android:textColor="#FFFFFF" android:layout_marginBottom="4dp" />
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- 返回按鈕（改為使用圖片） -->
+    <!-- 🔙 返回主畫面按鈕（使用客製圖） -->
     <ImageButton
         android:id="@+id/btnBackToMain"
         android:layout_width="64dp"
@@ -122,3 +65,4 @@
         android:tint="@null" />
 
 </LinearLayout>
+
